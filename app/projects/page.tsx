@@ -1,18 +1,55 @@
-const projects = [
-  { id: 1, name: "Final Year Project", progress: 80 },
-  { id: 2, name: "Group Work", progress: 50 },
-];
+"use client";
 
-export default function Projects() {
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+
+export default function ProjectsPage() {
+  const [projects, setProjects] = useState<any[]>([]);
+  const [name, setName] = useState("");
+
+  const loadProjects = async () => {
+    const res = await fetch("/api/projects");
+    const data = await res.json();
+    setProjects(data);
+  };
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const createProject = async () => {
+    await fetch("/api/projects", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+
+    setName("");
+    loadProjects();
+  };
+
   return (
     <div>
-      <h1>Projects</h1>
-      {projects.map(p => (
-        <div key={p.id}>
-          <h3>{p.name}</h3>
-          <p>Progress: {p.progress}%</p>
-        </div>
-      ))}
+      <h1 className="text-xl font-bold">Projects</h1>
+
+      <div className="mt-4">
+        <input
+          placeholder="New Project"
+          className="border p-2"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <button onClick={createProject} className="ml-2 bg-black text-white p-2">
+          Create
+        </button>
+      </div>
+
+      <ul className="mt-4 space-y-2">
+        {projects.map((p) => (
+          <li key={p.id} className="border p-2">
+            <Link href={`/projects/${p.id}`}>{p.name}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

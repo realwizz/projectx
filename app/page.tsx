@@ -1,9 +1,8 @@
-export default function Dashboard() {
+export default function HomePage() {
   return (
     <div>
-      <h1>Dashboard</h1>
-      <p>Total Projects: 2</p>
-      <p>Tasks Completed: 5 / 10</p>
+      <h1 className="text-2xl font-bold">Welcome to ProjectX</h1>
+      <p>Manage your projects and generate reports.</p>
     </div>
   );
 }

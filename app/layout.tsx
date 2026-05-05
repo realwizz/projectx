@@ -1,17 +1,25 @@
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html>
-      <body style={{ display: "flex" }}>
-        <nav style={{ width: "200px", padding: "20px", background: "#eee" }}>
-          <h3>ProjectX</h3>
-          <a href="/">Dashboard</a><br/>
-          <a href="/projects">Projects</a><br/>
-          <a href="/reports">Reports</a>
-        </nav>
+    <html lang="en">
+      <body>
+        <div className="flex">
+          {/* Sidebar */}
+          <aside className="w-64 border-r p-4">
+            <h2 className="font-bold">ProjectX</h2>
+            <nav className="mt-4 space-y-2">
+              <a href="/dashboard">Dashboard</a>
+              <a href="/projects">Projects</a>
+              <a href="/reports">Reports</a>
+            </nav>
+          </aside>
 
-        <main style={{ padding: "20px", flex: 1 }}>
-          {children}
-        </main>
+          {/* Page content */}
+          <main className="flex-1 p-6">{children}</main>
+        </div>
       </body>
     </html>
   );

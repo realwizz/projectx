@@ -22,6 +22,7 @@ let users: User[] = [];
 let projects: Project[] = [];
 let tasks: Task[] = [];
 
+// --- USERS ---
 export function addUser(user: User) {
   users.push(user);
 }
@@ -30,18 +31,42 @@ export function findUser(email: string) {
   return users.find(u => u.email === email);
 }
 
-export function createProject(project: Project) {
-  projects.push(project);
+// --- PROJECTS ---
+export function createProject(name: string, userId: number) {
+  const newProject: Project = {
+    id: Date.now(),
+    name,
+    userId,
+  };
+  projects.push(newProject);
+  return newProject;
 }
 
 export function getProjects() {
   return projects;
 }
 
-export function addTask(task: Task) {
-  tasks.push(task);
+export function getProjectById(id: number) {
+  return projects.find(p => p.id === id);
+}
+
+// --- TASKS ---
+export function addTask(projectId: number, title: string) {
+  const newTask: Task = {
+    id: Date.now(),
+    projectId,
+    title,
+    status: "todo",
+  };
+  tasks.push(newTask);
+  return newTask;
 }
 
 export function getTasksByProject(projectId: number) {
   return tasks.filter(t => t.projectId === projectId);
+}
+
+export function updateTaskStatus(taskId: number, status: "todo" | "done") {
+  const task = tasks.find(t => t.id === taskId);
+  if (task) task.status = status;
 }
