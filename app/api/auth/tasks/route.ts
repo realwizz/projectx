@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { NextResponse } from "next/server";
 import { addTask, getTasksByProject } from "@/lib/db";
 
@@ -23,4 +24,14 @@ export async function GET(req: Request) {
   const tasks = getTasksByProject(projectId);
 
   return NextResponse.json(tasks);
+=======
+import { updateTaskStatus } from "@/lib/db";
+
+export async function POST(req: Request) {
+  const { taskId, status } = await req.json();
+
+  updateTaskStatus(taskId, status);
+
+  return Response.json({ success: true });
+>>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
 }
