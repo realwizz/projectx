@@ -1,87 +1,90 @@
-type User = {
-  id: number;
-  email: string;
-  password: string;
-  role: "user" | "admin";
-};
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { pgTable, text, integer, boolean, timestamp, serial } from "drizzle-orm/pg-core";
+import { eq } from "drizzle-orm";
 
-type Project = {
-  id: number;
-  name: string;
-  userId: number;
-};
+// Start connection
+const sql = neon(process.env.DATABASE_URL!);
+export const db = drizzle(sql);
 
-type Task = {
-  id: number;
-  projectId: number;
-  title: string;
-  status: "todo" | "done";
-};
+// Defining the schemas
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  role: text("role").$type<"user" | "admin">().default("user").notNull(),
+});
 
-let users: User[] = [];
+export const projects = pgTable("projects", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  userId: integer("user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
-let projects: Project[] = [];
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  projectId: integer("project_id").references(() => projects.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  weight: integer("weight").default(1),
+  status: text("status").$type<"todo" | "done">().default("todo").notNull(),
+});
 
-let tasks: Task[] = [];
-
-export function addUser(user: User) {
-  users.push(user);
+export async function addUser(user: { email: string; password: string; role: "user" | "admin" }) {
+  return await db.insert(users).values(user).returning();
 }
 
-export function findUser(email: string) {
-  return users.find((u) => u.email === email);
+export async function findUser(email: string) {
+  const result = await db.select().from(users).where(eq(users.email, email));
+  return result[0]; // Returns the user or undefined
 }
 
-export function createProject(name: string, userId: number) {
-  const newProject: Project = {
-    id: Date.now(),
+export async function createProject(name: string, userId: number) {
+  const result = await db.insert(projects).values({
     name,
     userId,
-  };
-
-  projects.push(newProject);
-
-  return newProject;
+  }).returning();
+  return result[0];
 }
 
-export function getProjects() {
-  return projects;
+export async function getProjects() {
+  return await db.select().from(projects);
 }
 
-export function getProjectById(id: number) {
-  return projects.find((p) => p.id === id);
+export async function getProjectById(id: number) {
+  const result = await db.select().from(projects).where(eq(projects.id, id));
+  return result[0];
 }
 
-export function addTask(projectId: number, title: string) {
-  const task: Task = {
-    id: Date.now(),
+export async function addTask(projectId: number, title: string, weight: number = 1) {
+  const result = await db.insert(tasks).values({
     projectId,
     title,
+    weight,
     status: "todo",
-  };
-
-  tasks.push(task);
-
-  return task;
+  }).returning();
+  return result[0];
 }
 
-export function updateTaskStatus(
-  taskId: number,
-  status: "todo" | "done"
-) {
-  const task = tasks.find((t) => t.id === taskId);
-
-  if (task) {
-    task.status = status;
-  }
-
-  return task;
+export async function updateTaskStatus(taskId: number, status: "todo" | "done") {
+  const result = await db.update(tasks)
+    .set({ status })
+    .where(eq(tasks.id, taskId))
+    .returning();
+  return result[0];
 }
 
-export function getTasksByProject(projectId: number) {
-  return tasks.filter((t) => t.projectId === projectId);
+export async function getTasksByProject(projectId: number) {
+  return await db.select().from(tasks).where(eq(tasks.projectId, projectId));
 }
 
-export function getAllTasks() {
-  return tasks;
+export async function getAllTasks() {
+  return await db.select().from(tasks);
+}
+
+// dashboard logic
+export async function getProjectWithTasks(projectId: number) {
+  const project = await getProjectById(projectId);
+  const projectTasks = await getTasksByProject(projectId);
+  return { ...project, tasks: projectTasks };
 }
