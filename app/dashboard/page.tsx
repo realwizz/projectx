@@ -1,6 +1,8 @@
 "use client";
-
 import { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import ProjectCard from "@/components/ProjectCard";
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
@@ -8,30 +10,59 @@ export default function DashboardPage() {
   useEffect(() => {
     fetch("/api/dashboard")
       .then((res) => res.json())
-      .then(setData);
+      .then((json) => setData(json));
   }, []);
 
-  if (!data) return <p>Loading...</p>;
+  if (!data) return <div className="p-8 text-center">Loading Dashboard...</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="p-8 space-y-8">
+      <header>
+        <h1 className="text-3xl font-bold tracking-tight">
+          ProjectX Dashboard
+        </h1>
+        <p className="text-muted-foreground text-sm">
+          Real-time progress overview.
+        </p>
+      </header>
 
-      <div className="grid grid-cols-2 gap-4 mt-4">
-        <div className="border p-4">
-          <p>Total Projects</p>
-          <h2 className="text-xl">{data.projects}</h2>
-        </div>
+      {/* KPI Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Projects
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {data.summary.totalProjects}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">
+              Avg. Completion Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {data.summary.avgProgress}%
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        <div className="border p-4">
-          <p>Tasks Completed</p>
-          <h2 className="text-xl">{data.completedTasks}</h2>
-        </div>
-
-        <div className="border p-4">
-          <p>Overdue Tasks</p>
-          <h2 className="text-xl">{data.overdue}</h2>
-        </div>
+      {/* Projects List */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {data.projects.map((project: any) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            progress={project.progress}
+          />
+        ))}
       </div>
     </div>
   );
