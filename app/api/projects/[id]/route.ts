@@ -1,17 +1,5 @@
-<<<<<<< HEAD
-import { getProjectById, getTasksByProject } from "@/lib/db";
-
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  const project = getProjectById(Number(params.id));
-  const tasks = getTasksByProject(Number(params.id));
-
-  return Response.json({ project, tasks });
-=======
 import { NextRequest, NextResponse } from "next/server";
-import { getProjects, getTasksByProject } from "@/lib/db";
+import { getProjectById, getTasksByProject } from "@/lib/db";
 
 export async function GET(
   req: NextRequest,
@@ -19,12 +7,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-
     const projectId = Number(id);
 
-    const project = getProjects().find(
-      (p) => p.id === projectId
-    );
+    // fetch data from DB
+    const project = await getProjectById(projectId);
+    const tasks = await getTasksByProject(projectId);
 
     if (!project) {
       return NextResponse.json(
@@ -33,17 +20,15 @@ export async function GET(
       );
     }
 
-    const tasks = getTasksByProject(projectId);
-
     return NextResponse.json({
-      project,
-      tasks,
+      ...project,
+      tasks: tasks || [],
     });
   } catch (error) {
+    console.error("GET PROJECT ERROR:", error);
     return NextResponse.json(
       { error: "Failed to load project" },
       { status: 500 }
     );
   }
->>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
 }

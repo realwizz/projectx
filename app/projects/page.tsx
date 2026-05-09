@@ -1,22 +1,15 @@
 "use client";
 
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
-=======
 import { useEffect, useState } from "react";
->>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
-import Link from "next/link";
+import ProjectCard from "@/components/ProjectCard";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [name, setName] = useState("");
 
   const loadProjects = async () => {
-<<<<<<< HEAD
-    const res = await fetch("/api/projects");
-    const data = await res.json();
-    setProjects(data);
-=======
     try {
       const res = await fetch("/api/projects");
       const data = await res.json();
@@ -24,19 +17,14 @@ export default function ProjectsPage() {
     } catch (err) {
       console.error("Failed to load projects", err);
     }
->>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
   };
 
   useEffect(() => {
     loadProjects();
   }, []);
 
-  const createProject = async () => {
-<<<<<<< HEAD
-    await fetch("/api/projects", {
-      method: "POST",
-      body: JSON.stringify({ name }),
-=======
+  const createProject = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!name) return;
 
     await fetch("/api/projects", {
@@ -46,9 +34,8 @@ export default function ProjectsPage() {
       },
       body: JSON.stringify({
         name,
-        userId: 1,
+        userId: 1, // temporary placeholder for demo
       }),
->>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
     });
 
     setName("");
@@ -56,60 +43,46 @@ export default function ProjectsPage() {
   };
 
   return (
-<<<<<<< HEAD
-    <div>
-      <h1 className="text-xl font-bold">Projects</h1>
+    <div className="p-8 max-w-6xl mx-auto space-y-8">
+      <header className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Your Projects</h1>
+          <p className="text-muted-foreground text-sm">
+            Manage and track your weighted progress.
+          </p>
+        </div>
+      </header>
 
-      <div className="mt-4">
-        <input
-          placeholder="New Project"
-          className="border p-2"
+      {/* Create Project Section */}
+      <form onSubmit={createProject} className="flex gap-2 max-w-md">
+        <Input
+          placeholder="New Project Name..."
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <button onClick={createProject} className="ml-2 bg-black text-white p-2">
-=======
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Projects</h1>
+        <Button type="submit">Create Project</Button>
+      </form>
 
-      <div className="mt-4 flex gap-2">
-        <input
-          placeholder="Project Name"
-          className="border p-2 rounded"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <button
-          onClick={createProject}
-          className="bg-black text-white px-4 py-2 rounded"
-        >
->>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
-          Create
-        </button>
-      </div>
-
-<<<<<<< HEAD
-      <ul className="mt-4 space-y-2">
-        {projects.map((p) => (
-          <li key={p.id} className="border p-2">
-            <Link href={`/projects/${p.id}`}>{p.name}</Link>
-          </li>
-        ))}
-      </ul>
-=======
-      <div className="mt-6 space-y-2">
+      {/* Projects Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <Link
+          <ProjectCard
             key={project.id}
-            href={`/projects/${project.id}`}
-            className="block border p-4 rounded hover:bg-gray-100"
-          >
-            <h2 className="font-semibold">{project.name}</h2>
-          </Link>
+            project={project}
+            // We'll pass 0 as default progress for this list view
+            // or you can calculate it if your API sends it
+            progress={project.progress || 0}
+          />
         ))}
       </div>
->>>>>>> c9fdf41 (updated projects page to dynamically change on new project creation)
+
+      {projects.length === 0 && (
+        <div className="text-center py-20 border-2 border-dashed rounded-xl">
+          <p className="text-muted-foreground">
+            No projects found. Create your first one above!
+          </p>
+        </div>
+      )}
     </div>
   );
 }
