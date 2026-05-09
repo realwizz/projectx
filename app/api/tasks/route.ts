@@ -1,13 +1,23 @@
-import { addTask } from "@/lib/db";
+import { NextResponse } from "next/server";
+import { addTask, getAllTasks } from "@/lib/db";
+
+export async function GET() {
+  const tasks = await getAllTasks();
+  return NextResponse.json(tasks);
+}
 
 export async function POST(req: Request) {
-  const { projectId, title } = await req.json();
+  try {
+    const { projectId, title, weight } = await req.json();
 
-  if (!title) {
-    return Response.json({ error: "Title required" }, { status: 400 });
+    if (!projectId || !title) {
+      return NextResponse.json({ error: "Project ID and Title are required" }, { status: 400 });
+    }
+
+    const task = await addTask(Number(projectId), title, weight || 1);
+
+    return NextResponse.json(task);
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to create task" }, { status: 500 });
   }
-
-  const task = addTask(projectId, title);
-
-  return Response.json(task);
 }
