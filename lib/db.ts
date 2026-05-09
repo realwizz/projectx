@@ -88,3 +88,24 @@ export async function getProjectWithTasks(projectId: number) {
   const projectTasks = await getTasksByProject(projectId);
   return { ...project, tasks: projectTasks };
 }
+
+export async function getDashboardStats() {
+  const allProjects = await getProjects();
+  const allTasks = await getAllTasks();
+
+  const stats = allProjects.map((project) => {
+    const projectTasks = allTasks.filter((t) => t.projectId === project.id);
+    
+    if (projectTasks.length === 0) return { ...project, progress: 0 };
+
+    const totalWeight = projectTasks.reduce((sum, t) => sum + (t.weight || 1), 0);
+    const completedWeight = projectTasks.reduce((sum, t) => 
+      sum + (t.status === "done" ? (t.weight || 1) : 0), 0
+    );
+
+    const progress = Math.round((completedWeight / totalWeight) * 100);
+    return { ...project, progress };
+  });
+
+  return stats;
+}
