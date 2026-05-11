@@ -1,34 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getProjectById, getTasksByProject } from "@/lib/db";
+import { NextResponse } from "next/server";
+import { db, projects } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
-export async function GET(
-  req: NextRequest,
+// UPDATE PROJECT
+export async function PATCH(
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const projectId = Number(id);
+    const { name } = await req.json();
 
-    // fetch data from DB
-    const project = await getProjectById(projectId);
-    const tasks = await getTasksByProject(projectId);
+    const updatedProject = await db
+      .update(projects)
+      .set({ name })
+      .where(eq(projects.id, Number(id)))
+      .returning();
 
-    if (!project) {
-      return NextResponse.json(
-        { error: "Project not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      ...project,
-      tasks: tasks || [],
-    });
+    return NextResponse.json(updatedProject[0]);
   } catch (error) {
-    console.error("GET PROJECT ERROR:", error);
-    return NextResponse.json(
-      { error: "Failed to load project" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to update project" }, { status: 500 });
+  }
+}
+
+// DELETE PROJECT
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    await db.delete(projects).where(eq(projects.id, Number(id)));
+
+    return NextResponse.json({ message: "Project deleted successfully" });
+  } catch (error) {
+    return NextResponse.json({ error: "Failed to delete project" }, { status: 500 });
   }
 }
