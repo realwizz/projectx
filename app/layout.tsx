@@ -41,17 +41,19 @@ export default function RootLayout({
                 <h2 className="font-bold text-xl tracking-tight text-blue-600">
                   ProjectX
                 </h2>
-                <nav className="mt-8 flex flex-col gap-4">
+                <nav className="mt-8 flex flex-col gap-1">
                   <Link
                     href="/projects"
-                    className="text-sm font-medium hover:text-blue-600 transition-colors"
+                    className="group flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-white hover:shadow-sm text-slate-600 hover:text-blue-600 border border-transparent hover:border-slate-200"
                   >
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-blue-600" />
                     Projects
                   </Link>
                   <Link
                     href="/reports"
-                    className="text-sm font-medium hover:text-blue-600 transition-colors"
+                    className="group flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-all hover:bg-white hover:shadow-sm text-slate-600 hover:text-blue-600 border border-transparent hover:border-slate-200"
                   >
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-blue-600" />
                     Reports
                   </Link>
                 </nav>
@@ -82,7 +84,7 @@ export default function RootLayout({
                         Active Session
                       </span>
                       <span className="text-[10px] text-slate-500 italic">
-                        Dissertation Mode
+                        Dissertation
                       </span>
                     </div>
                   </div>
