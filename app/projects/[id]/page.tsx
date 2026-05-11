@@ -15,13 +15,13 @@ export default function ProjectDetailPage() {
   const [project, setProject] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [title, setTitle] = useState("");
+  const [weight, setWeight] = useState(1);
 
   const load = async () => {
     try {
       const res = await fetch(`/api/projects/${id}`);
       const data = await res.json();
 
-      // Since our API returns { ...project, tasks: [...] }
       setProject(data);
       setTasks(data.tasks || []);
     } catch (err) {
@@ -43,17 +43,18 @@ export default function ProjectDetailPage() {
       body: JSON.stringify({
         projectId: Number(id),
         title,
-        weight: 1, // Default weight
+        weight: Number(weight),
       }),
     });
 
     setTitle("");
+    setWeight(1);
     load();
   };
 
   const toggleTask = async (taskId: number, currentStatus: string) => {
     await fetch("/api/tasks/update", {
-      method: "PATCH", // Changed to PATCH to match our Route Handler
+      method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         taskId,
@@ -67,7 +68,7 @@ export default function ProjectDetailPage() {
   if (!project)
     return <div className="p-10 text-center">Loading Project...</div>;
 
-  // Calculate progress for the dissertation "live" demo bar
+  // Calculate progress
   const totalWeight = tasks.reduce((sum, t) => sum + (t.weight || 1), 0);
   const completedWeight = tasks.reduce(
     (sum, t) => sum + (t.status === "done" ? t.weight || 1 : 0),
@@ -100,14 +101,31 @@ export default function ProjectDetailPage() {
           <CardTitle className="text-lg">Add New Task</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={addTask} className="flex gap-2">
+          <form
+            onSubmit={addTask}
+            className="flex gap-2 items-center bg-slate-50 p-4 rounded-lg"
+          >
             <Input
-              placeholder="What needs to be done?"
+              placeholder="Task title..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="flex-1"
+              className="flex-1 p-2 border rounded"
             />
-            <Button type="submit">Add Task</Button>
+            <select
+              value={weight}
+              onChange={(e) => setWeight(Number(e.target.value))}
+              className="border rounded p-2 text-sm bg-white"
+            >
+              <option value={1}>Low (1)</option>
+              <option value={3}>Medium (3)</option>
+              <option value={5}>High (5)</option>
+            </select>
+            <Button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+            >
+              Add Task
+            </Button>
           </form>
         </CardContent>
       </Card>

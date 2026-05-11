@@ -54,13 +54,18 @@ export default function ProjectsPage() {
       </header>
 
       {/* Create Project Section */}
-      <form onSubmit={createProject} className="flex gap-2 max-w-md">
+      <form
+        onSubmit={createProject}
+        className="flex flex-row items-center gap-2 w-full max-w-md"
+      >
         <Input
           placeholder="New Project Name..."
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
-        <Button type="submit">Create Project</Button>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium whitespace-nowrap hover:bg-blue-700 transition-colors">
+          Create Project
+        </button>
       </form>
 
       {/* Projects Grid */}
@@ -69,8 +74,6 @@ export default function ProjectsPage() {
           <ProjectCard
             key={project.id}
             project={project}
-            // We'll pass 0 as default progress for this list view
-            // or you can calculate it if your API sends it
             progress={project.progress || 0}
           />
         ))}
