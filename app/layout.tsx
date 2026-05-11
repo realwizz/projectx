@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider afterSignOutUrl="/">
       <html
         lang="en"
         className={cn("font-sans", geist.variable)}
@@ -35,12 +35,16 @@ export default function RootLayout({
       >
         <body className="antialiased text-slate-900 bg-white">
           <div className="flex min-h-screen">
-            {/* Sidebar */}
-            <aside className="w-64 border-r p-6 flex flex-col justify-between bg-slate-50/50">
+            {/* --- SIDEBAR --- */}
+            <aside className="w-64 border-r p-6 flex flex-col justify-between bg-slate-50/50 sticky top-0 h-screen">
               <div>
-                <h2 className="font-bold text-xl tracking-tight text-blue-600">
-                  ProjectX
-                </h2>
+                {/* LOGO */}
+                <Link href="/" className="group inline-block">
+                  <h2 className="font-bold text-xl tracking-tight text-blue-600 transition-colors group-hover:text-blue-700">
+                    Project<span className="text-slate-900">X</span>
+                  </h2>
+                </Link>
+
                 <nav className="mt-8 flex flex-col gap-1">
                   <Link
                     href="/projects"
@@ -59,17 +63,17 @@ export default function RootLayout({
                 </nav>
               </div>
 
-              {/* New Clerk Auth Section */}
+              {/* --- AUTH --- */}
               <div className="border-t pt-4">
                 <Show when="signed-out">
                   <div className="flex flex-col gap-2">
                     <SignInButton mode="modal">
-                      <span className="w-full block text-left text-sm font-medium bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors cursor-pointer rounded-md">
+                      <span className="w-full block text-center text-sm font-medium bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
                         Sign In
                       </span>
                     </SignInButton>
                     <SignUpButton mode="modal">
-                      <button className="w-full text-left text-sm font-medium border border-slate-200 py-2 px-4 rounded-md hover:bg-slate-100 transition-colors">
+                      <button className="w-full text-center text-sm font-medium border border-slate-200 py-2 px-4 rounded-md hover:bg-slate-100 transition-colors">
                         Sign Up
                       </button>
                     </SignUpButton>
@@ -84,7 +88,7 @@ export default function RootLayout({
                         Active Session
                       </span>
                       <span className="text-[10px] text-slate-500 italic">
-                        Dissertation
+                        Dissertation Mode
                       </span>
                     </div>
                   </div>
@@ -92,7 +96,7 @@ export default function RootLayout({
               </div>
             </aside>
 
-            {/* Page content */}
+            {/* --- MAIN PAGE CONTENT --- */}
             <main className="flex-1 overflow-y-auto">{children}</main>
           </div>
         </body>
